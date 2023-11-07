@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.6.2;
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-import "./IUniswapRouter01.sol";
+pragma solidity =0.8.4;
 
-interface IUniswapRouter02 is IUniswapRouter01 {
+import {IUniswapV2Router01} from "./IUniswapRouter01.sol";
+import {IUniswapV2ERC20} from "./IUniswapV2ERC20.sol";
+
+interface IUniswapV2Router is IUniswapV2Router01 {
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         address token,
         uint256 liquidity,

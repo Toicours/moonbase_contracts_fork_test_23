@@ -1,36 +1,24 @@
-pragma solidity =0.5.16;
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-import "./interfaces/IUniswapV2ERC20.sol";
-import "./libraries/SafeMath.sol";
+pragma solidity =0.8.4;
 
-contract UniswapV2ERC201 is IUniswapV2ERC20 {
-    using SafeMath for uint256;
+import {IUniswapV2ERC20} from "./interfaces/IUniswapV2ERC20.sol";
 
-    string public constant name = "MoonBase LP";
-    string public constant symbol = "MOON LP";
-    uint8 public constant decimals = 18;
-    uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+contract UniswapV2ERC20 is IUniswapV2ERC20 {
+    string public constant override name = "Uniswap V2";
+    string public constant override symbol = "UNI-V2";
+    uint8 public constant override decimals = 18;
+    uint256 public override totalSupply;
+    mapping(address => uint256) public override balanceOf;
+    mapping(address => mapping(address => uint256)) public override allowance;
 
-    bytes32 public DOMAIN_SEPARATOR;
+    bytes32 public override DOMAIN_SEPARATOR;
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-    bytes32 public constant PERMIT_TYPEHASH =
+    bytes32 public constant override PERMIT_TYPEHASH =
         0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-    mapping(address => uint256) public nonces;
+    mapping(address => uint256) public override nonces;
 
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    constructor() public {
-        uint256 chainId;
-        assembly {
-            chainId := chainid
-        }
+    constructor() {
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -38,21 +26,21 @@ contract UniswapV2ERC201 is IUniswapV2ERC20 {
                 ),
                 keccak256(bytes(name)),
                 keccak256(bytes("1")),
-                chainId,
+                block.chainid,
                 address(this)
             )
         );
     }
 
     function _mint(address to, uint256 value) internal {
-        totalSupply = totalSupply.add(value);
-        balanceOf[to] = balanceOf[to].add(value);
+        totalSupply += value;
+        balanceOf[to] += value;
         emit Transfer(address(0), to, value);
     }
 
     function _burn(address from, uint256 value) internal {
-        balanceOf[from] = balanceOf[from].sub(value);
-        totalSupply = totalSupply.sub(value);
+        balanceOf[from] -= value;
+        totalSupply -= value;
         emit Transfer(from, address(0), value);
     }
 
@@ -62,17 +50,23 @@ contract UniswapV2ERC201 is IUniswapV2ERC20 {
     }
 
     function _transfer(address from, address to, uint256 value) private {
-        balanceOf[from] = balanceOf[from].sub(value);
-        balanceOf[to] = balanceOf[to].add(value);
+        balanceOf[from] -= value;
+        balanceOf[to] += value;
         emit Transfer(from, to, value);
     }
 
-    function approve(address spender, uint256 value) external returns (bool) {
+    function approve(
+        address spender,
+        uint256 value
+    ) external override returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
-    function transfer(address to, uint256 value) external returns (bool) {
+    function transfer(
+        address to,
+        uint256 value
+    ) external override returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -81,11 +75,9 @@ contract UniswapV2ERC201 is IUniswapV2ERC20 {
         address from,
         address to,
         uint256 value
-    ) external returns (bool) {
-        if (allowance[from][msg.sender] != uint256(-1)) {
-            allowance[from][msg.sender] = allowance[from][msg.sender].sub(
-                value
-            );
+    ) external override returns (bool) {
+        if (allowance[from][msg.sender] != type(uint256).max) {
+            allowance[from][msg.sender] -= value;
         }
         _transfer(from, to, value);
         return true;
@@ -99,7 +91,7 @@ contract UniswapV2ERC201 is IUniswapV2ERC20 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
+    ) external override {
         require(deadline >= block.timestamp, "UniswapV2: EXPIRED");
         bytes32 digest = keccak256(
             abi.encodePacked(
