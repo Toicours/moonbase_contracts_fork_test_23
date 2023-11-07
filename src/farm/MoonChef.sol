@@ -1,25 +1,26 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity ^0.8.0;
 
-import "./helpers/SafeMath.sol";
-import "./libs/IBEP20.sol";
-import "./libs/SafeBEP20.sol";
-import "./helpers/Ownable.sol";
-import "./helpers/ReentrancyGuard.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-import "./MoonToken.sol";
+import "./CheeseToken.sol";
 
-// MasterChef is the master of moon. He can make moon and he is a fair guy.
+// MasterChef is the master of Cheese. He can make Cheese and he is a fair guy.
 //
 // Note that it's ownable and the owner wields tremendous power. The ownership
-// will be transferred to a governance smart contract once moon is sufficiently
+// will be transferred to a governance smart contract once Cheese is sufficiently
 // distributed and the community can show to govern itself.
 //
 // Have fun reading it. Hopefully it's bug-free. God bless.
 contract MoonChef is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     // Info of each user.
     struct UserInfo {
@@ -40,7 +41,7 @@ contract MoonChef is Ownable, ReentrancyGuard {
 
     // Info of each pool.
     struct PoolInfo {
-        IBEP20 lpToken; // Address of LP token contract.
+        IERC20 lpToken; // Address of LP token contract.
         uint256 allocPoint; // How many allocation points assigned to this pool. moons to distribute per block.
         uint256 lastRewardBlock; // Last block number that moons distribution occurs.
         uint256 accMoonPerShare; // Accumulated moons per share, times 1e12. See below.
@@ -48,7 +49,7 @@ contract MoonChef is Ownable, ReentrancyGuard {
     }
 
     // The moon TOKEN!
-    MoonToken public moon;
+    CheeseToken public cheese;
     // Dev address.
     address public devaddr;
     // moon tokens created per block.
@@ -81,12 +82,12 @@ contract MoonChef is Ownable, ReentrancyGuard {
     event UpdateEmissionRate(address indexed user, uint256 goosePerBlock);
 
     constructor(
-        MoonToken _moon,
+        CheeseToken _cheese,
         address _devaddr,
         address _feeAddress,
         uint256 _moonPerBlock
-    ) public {
-        moon = _moon;
+    ) {
+        cheese = _cheese;
         devaddr = _devaddr;
         feeAddress = _feeAddress;
         moonPerBlock = _moonPerBlock;
@@ -107,8 +108,8 @@ contract MoonChef is Ownable, ReentrancyGuard {
         return poolInfo.length;
     }
 
-    mapping(IBEP20 => bool) public poolExistence;
-    modifier nonDuplicated(IBEP20 _lpToken) {
+    mapping(IERC20 => bool) public poolExistence;
+    modifier nonDuplicated(IERC20 _lpToken) {
         require(poolExistence[_lpToken] == false, "nonDuplicated: duplicated");
         _;
     }
@@ -116,7 +117,7 @@ contract MoonChef is Ownable, ReentrancyGuard {
     // Add a new lp to the pool. Can only be called by the owner.
     function add(
         uint256 _allocPoint,
-        IBEP20 _lpToken,
+        IERC20 _lpToken,
         uint16 _depositFeeBP,
         bool _withUpdate
     ) public onlyOwner nonDuplicated(_lpToken) {
@@ -221,8 +222,8 @@ contract MoonChef is Ownable, ReentrancyGuard {
             .mul(moonPerBlock)
             .mul(pool.allocPoint)
             .div(totalAllocPoint);
-        moon.mint(devaddr, moonReward.div(18));
-        moon.mint(address(this), moonReward);
+        cheese.mint(devaddr, moonReward.div(18));
+        cheese.mint(address(this), moonReward);
         pool.accMoonPerShare = pool.accMoonPerShare.add(
             moonReward.mul(1e12).div(lpSupply)
         );
@@ -295,12 +296,12 @@ contract MoonChef is Ownable, ReentrancyGuard {
 
     // Safe moon transfer function, just in case if rounding error causes pool to not have enough moons.
     function safeMoonTransfer(address _to, uint256 _amount) internal {
-        uint256 moonBal = moon.balanceOf(address(this));
+        uint256 moonBal = cheese.balanceOf(address(this));
         bool transferSuccess = false;
         if (_amount > moonBal) {
-            transferSuccess = moon.transfer(_to, moonBal);
+            transferSuccess = cheese.transfer(_to, moonBal);
         } else {
-            transferSuccess = moon.transfer(_to, _amount);
+            transferSuccess = cheese.transfer(_to, _amount);
         }
         require(transferSuccess, "safeMoonTransfer: transfer failed");
     }

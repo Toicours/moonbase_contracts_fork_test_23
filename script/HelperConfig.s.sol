@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.18;
+pragma solidity >=0.8.4;
 
 import {Script} from "forge-std/Script.sol";
 import {Test, console} from "forge-std/Test.sol";
-import {WETH} from "@solmate/tokens/WETH.sol";
+import {WETH} from "@solmate/src/tokens/WETH.sol";
 
 contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
