@@ -20,6 +20,8 @@ contract HelperConfig is Script {
             block.chainid == 84532
         ) {
             activeNetworkConfig = getBaseConfig();
+        } else if (block.chainid == 534352) {
+            activeNetworkConfig = getScrollConfig();
         } else if (block.chainid == 31337) {
             activeNetworkConfig = getAnvilConfig();
         } else {
@@ -33,6 +35,14 @@ contract HelperConfig is Script {
             deployerKey: vm.envAddress("DEPLOYER_ADDRESS")
         });
         return baseConfig;
+    }
+
+    function getScrollConfig() public view returns (NetworkConfig memory) {
+        NetworkConfig memory scrollConfig = NetworkConfig({
+            weth: address(0x5300000000000000000000000000000000000004),
+            deployerKey: vm.envAddress("DEPLOYER_ADDRESS")
+        });
+        return scrollConfig;
     }
 
     function getAnvilConfig() public returns (NetworkConfig memory) {
