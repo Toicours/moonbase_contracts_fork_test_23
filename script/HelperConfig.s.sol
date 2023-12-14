@@ -22,6 +22,8 @@ contract HelperConfig is Script {
             activeNetworkConfig = getBaseConfig();
         } else if (block.chainid == 534352) {
             activeNetworkConfig = getScrollConfig();
+        } else if (block.chainid == 11155111) {
+            activeNetworkConfig = getSepoliaConfig();
         } else if (block.chainid == 31337) {
             activeNetworkConfig = getAnvilConfig();
         } else {
@@ -54,5 +56,13 @@ contract HelperConfig is Script {
             deployerKey: vm.envAddress("ANVIL_ADDRESS")
         });
         return anvilConfig;
+    }
+
+    function getSepoliaConfig() public view returns (NetworkConfig memory) {
+        NetworkConfig memory sepoliaConfig = NetworkConfig({
+            weth: address(0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14),
+            deployerKey: vm.envAddress("DEPLOYER_ADDRESS")
+        });
+        return sepoliaConfig;
     }
 }

@@ -44,6 +44,8 @@ ifeq ($(NETWORK),base)
 	NETWORK_ARGS := --rpc-url $(BASE_RPC_URL) --account deployerKey --sender 0x83C73e1aCa5D406862e0D37Ff87A1175AFCefa5e --broadcast --verify --optimizer-runs 200  --etherscan-api-key $(BASESCAN_API_KEY) -vvvv
 else ifeq ($(NETWORK),base_goerli)
 	NETWORK_ARGS := --rpc-url $(BASE_GOERLI_RPC_URL) --account deployerKey --sender 0x83C73e1aCa5D406862e0D37Ff87A1175AFCefa5e --broadcast --verify --optimizer-runs 200 --etherscan-api-key $(BASESCAN_API_KEY) -vvvv
+else ifeq ($(NETWORK),sepolia)
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account deployerKey --sender 0x83C73e1aCa5D406862e0D37Ff87A1175AFCefa5e --broadcast --verify --optimizer-runs 200 --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 else ifeq ($(NETWORK),scroll)
 	NETWORK_ARGS := --rpc-url $(SCROLL_RPC_URL) --account deployerKey --sender 0x83C73e1aCa5D406862e0D37Ff87A1175AFCefa5e --broadcast --verify --verifier blockscout --verifier-url https://blockscout.scroll.io/api\? --optimizer-runs 200 -vvvv
 else ifeq ($(NETWORK),scroll_sepolia)
